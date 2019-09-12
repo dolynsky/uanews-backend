@@ -29,7 +29,7 @@ app.listen(3001, function() {
     console.log("Server starting on port 3001");
 });
 
-cron.schedule("* * * * *", collectData);
+//cron.schedule("* * * * *", collectData);
 
 async function collectData() {
     await gather();
