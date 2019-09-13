@@ -10,8 +10,9 @@ const topicSchema = new mongoose.Schema({
     region: String,
     title: { type: String, required: true },
     date: { type: Date, required: true },
-    rating: { type: Number, default: 0 },
-    ratingAvailable: { type: Boolean, default: false }
+    content: { type: String, default: "" },
+    titleMatches: { type: Number, default: 0 },
+    contentMatches: { type: Number, default: 0 },
 });
 
 const Topic = mongoose.model("Topic", topicSchema);

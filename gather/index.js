@@ -1,9 +1,12 @@
 const Topic = require("../models/topic");
 const axios = require("axios");
+const getContent = require("./getContent");
+const calcRating = require("./calcContentMatches");
+const calcTitleMatches = require("./calcTitleMatches");
 
-const cities = [
+const regions = [
     "kiev",
-    /*"ivano_frankovsk",
+    "ivano_frankovsk",
     "lutsk",
     "zhitomir",
     "lvov",
@@ -23,7 +26,7 @@ const cities = [
     "odessa",
     "sumy",
     "herson",
-    "chernigov"*/
+    "chernigov"
 ];
 
 function getUrl(city, page) {
@@ -46,7 +49,7 @@ module.exports = async function () {
     }
 
     let urls = [];
-    cities.forEach(city => {
+    regions.forEach(city => {
         for (let page = 1; page <= depth; page++) {
             urls.push(getUrl(city, page));
         }
@@ -60,6 +63,9 @@ module.exports = async function () {
                 tops.forEach(top => (top.Region = Title));
                 topics = topics.concat(tops);
             });
+
+            //topics = topics.slice(0, 10);
+
             topics.forEach(({ Region, DateCreated, Title, PartnerTitle, Url, Id }) => {
                 Topic.create({
                     topicID: Id,
@@ -69,9 +75,15 @@ module.exports = async function () {
                     title: Title,
                     date: new Date(DateCreated * 1000)
                 })
+                .then(topic => {
+                    console.log(`Topic created: ${topic.title}`);
+                    calcTitleMatches(topic).then(() => {
+                        getContent(topic);
+                    });
+                })
                 .catch(e => {
                     if (e.code !== 11000) {
-                        console.log(e);
+                        //console.log(e);
                     }
                 });
             });

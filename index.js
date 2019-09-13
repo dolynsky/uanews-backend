@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const cron = require("node-cron");
 const topicRoutes = require("./routes/topics");
 const gather = require("./gather");
-const getRating = require("./gather/getRating");
+const rebuildRating = require("./gather/rebuildRating");
 
 app.use(morgan("tiny"));
 app.use(cors());
@@ -29,11 +29,7 @@ app.listen(3001, function() {
     console.log("Server starting on port 3001");
 });
 
-//cron.schedule("* * * * *", collectData);
+cron.schedule("* * * * *", gather);
 
-async function collectData() {
-    await gather();
-    await getRating();
-}
-
-collectData();
+//gather();
+//rebuildRating();
