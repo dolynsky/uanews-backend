@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const cron = require("node-cron");
 const topicRoutes = require("./routes/topics");
 const gather = require("./gather");
-const rebuildRating = require("./gather/rebuildRating");
+const rebuildMatches = require("./gather/rebuildMatches");
 
 app.use(morgan("tiny"));
 app.use(cors());
@@ -32,4 +32,4 @@ app.listen(3001, function() {
 cron.schedule("* * * * *", gather);
 
 //gather();
-//rebuildRating();
+//rebuildMatches();

@@ -1,6 +1,7 @@
 const Filter = require("./models/filter");
+const rebuildMatches = require("./gather/rebuildMatches");
 
-const data = [
+const includes = [
     "злочин",
     "преступ",
     "зник",
@@ -56,11 +57,41 @@ const data = [
     "хуліган",
 ];
 
-const queryArray = data.map(el => {return {text: el}});
+const excludes = [
+    "сбу",
+    "військ",
+    "воєнн",
+    "военн",
+    "дтп",
+    "пішох",
+    "пешех",
+    "чиновни",
+    "водій",
+    "водител",
+    "збив",
+    "сбил",
+    "посадов",
+    "очільн",
+    "глава",
+    "воин",
+    "спецпризн",
+    "спецназ",
+    "керівни",
+    "начальни",
+    "боєць",
+    "бійц",
+    "боец",
+    "аварія",
+    "авария"
+];
+
+const includeArray = includes.map(el => {return {text: el}});
+const excludeArray = excludes.map(el => {return {text: el, isExclude: true}});
 
 Filter.collection.drop()
 .then(() => {
-    Filter.insertMany(queryArray, function(err, items) {
+    Filter.insertMany([...includeArray, ...excludeArray], function(err, items) {
         console.log(`${items.length} filters created`);
+        rebuildMatches();
     });
 });

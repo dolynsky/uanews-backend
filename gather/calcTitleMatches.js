@@ -1,14 +1,17 @@
 const Filter = require("../models/filter");
 
 module.exports = async function(topic) {
-    const f = await Filter.find({}, 'text');
-    const filters = f.map(el => el.text);
+    const filters = await Filter.find({});
 
     const content = topic.title.toLowerCase();
     let matches = 0;
-    filters.forEach(el => {
-        if (content.includes(el)) {
-            matches++;
+    filters.forEach(({text, isExclude}) => {
+        if (content.includes(text)) {
+            if (!isExclude) {
+                matches++;
+            } else {
+                topic.isExcluded = true;
+            }
         }
     });
 
