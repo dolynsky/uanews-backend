@@ -1,7 +1,4 @@
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/uanews-app");
-//mongoose.set("debug", true);
-mongoose.Promise = Promise;
 
 const topicSchema = new mongoose.Schema({
     topicID: { type: Number, required: true, unique: true },

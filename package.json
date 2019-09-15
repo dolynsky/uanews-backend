@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "node index.js"
+    "run": "node index.js",
+    "populateFilters": "node populateFilters.js",
+    "dropTopics": "node dropTopics.js"
   },
   "keywords": [],
   "author": "",

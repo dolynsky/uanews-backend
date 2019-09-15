@@ -64,10 +64,10 @@ module.exports = async function () {
                 topics = topics.concat(tops);
             });
 
-            //topics = topics.slice(0, 10);
+            //topics = topics.slice(0, 5);
 
-            topics.forEach(({ Region, DateCreated, Title, PartnerTitle, Url, Id }) => {
-                Topic.create({
+            topicsPromises = topics.map(({ Region, DateCreated, Title, PartnerTitle, Url, Id }) => {
+                return Topic.create({
                     topicID: Id,
                     url: Url,
                     partner: PartnerTitle,
@@ -75,18 +75,24 @@ module.exports = async function () {
                     title: Title,
                     date: new Date(DateCreated * 1000)
                 })
-                .then(topic => {
-                    console.log(`Topic created: ${topic.title}`);
-                    calcTitleMatches(topic).then(() => {
-                        getContent(topic);
-                    });
+                .then(async function(topic) {
+                    //console.log(`Topic created: ${topic.title}`);
+                    await calcTitleMatches(topic);
+                    await getContent(topic);
+                    return topic;
                 })
                 .catch(e => {
                     if (e.code !== 11000) {
                         //console.log(e);
                     }
+                    return null;
                 });
             });
+            Promise.all(topicsPromises)
+            .then((topics)=>{
+                topics = topics.filter(el => el != null);
+                console.log(`Topics created: ${topics.length}`);
+            })
         })
     );
 }

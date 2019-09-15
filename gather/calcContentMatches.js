@@ -11,8 +11,7 @@ module.exports = async function(topic) {
         }
     });
 
-    //const rating = filters.map(el => topic.content.includes(el) ? 1 : 0).reduce((prev, current) => prev + current, 0);
-    console.log(`Content matches: ${matches} (${topic.title})`);
+    //console.log(`Content matches: ${matches} (${topic.title})`);
     topic.contentMatches = matches;
     await topic.save();
 };
