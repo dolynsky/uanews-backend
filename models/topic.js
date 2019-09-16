@@ -11,6 +11,7 @@ const topicSchema = new mongoose.Schema({
     titleMatches: { type: Number, default: 0 },
     contentMatches: { type: Number, default: 0 },
     isExcluded: { type: Boolean, default: false },
+    isReady: { type: Boolean, default: false },
 });
 
 const Topic = mongoose.model("Topic", topicSchema);

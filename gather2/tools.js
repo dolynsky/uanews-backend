@@ -1,7 +1,7 @@
 const Apify = require('apify');
 const routes = require('./routes').default;
 const { getDomainName } = require("../utils");
-const { getTopicsCount } = require("../models");
+const { getUnloadedTopics } = require("../models");
 const getURLs = require("./urls");
 const {
     utils: { log },
@@ -9,15 +9,22 @@ const {
 
 exports.getSources = async () => {
     log.debug('Getting sources.');
-    const count = await getTopicsCount();
-    const urls = getURLs(count === 0);
-    return urls.map(url => ({
+    const urls = getURLs();
+    const unloadedUrls = await getUnloadedTopics();
+    urls = urls.map(url => ({
         url: `${url}`,
         userData: {
             label: 'MAIN',
             state: 'INITIAL'
         },
     }));
+    unloadedUrls = unloadedUrls.map(url => ({
+        url: `${url}`,
+        userData: {
+            label: 'DETAIL',
+        },
+    }));
+    return [...urls, ...unloadedUrls];
 };
 
 exports.createRouter = globalContext => {

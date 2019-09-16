@@ -1,18 +1,22 @@
 const Apify = require('apify');
 const tools = require('./tools');
+const prepopulateFromUkrNet = require('./ukrnet/prepopulateFromUkrNet');
 const {
     utils: { log },
 } = Apify;
 
 module.exports = async function () {
+    prepopulateFromUkrNet();
+    crawlPages();
+}
+
+function crawlPages() {
     log.info('Starting gather.');
     const requestList = await Apify.openRequestList('main', await tools.getSources());
     const requestQueue = await Apify.openRequestQueue();
     const router = tools.createRouter({ requestQueue });
 
     log.debug('Setting up crawler.');
-    const crawler = new Apify.BasicCrawler({});
-
     const crawler = new Apify.CheerioCrawler({
         //maxRequestsPerCrawl: 50,
         requestList,

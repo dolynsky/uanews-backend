@@ -7,6 +7,11 @@ module.exports.getTopicsCount = async function() {
     return found;
 };
 
+module.exports.getUnloadedTopics = async function() {
+    const found = await Topic.find({isLoaded: false});
+    return found;
+};
+
 module.exports.checkUrlLoaded = async function(url) {
     const found = await Topic.find({ url }).countDocuments();
     return found > 0;
