@@ -10,7 +10,7 @@ const rebuildMatches = require("./gather/rebuildMatches");
 require('dotenv').config();
 
 mongoose.Promise = Promise;
-//mongoose.set("debug", true);
+mongoose.set("debug", true);
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);

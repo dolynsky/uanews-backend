@@ -9,8 +9,9 @@ const {
 
 exports.getSources = async () => {
     log.debug('Getting sources.');
-    const urls = getURLs();
-    const unloadedUrls = await getUnloadedTopics();
+    let urls = getURLs();
+    let unloadedUrls = await getUnloadedTopics();
+    log.info(`unloadedUrls: ${unloadedUrls.length}`)
     urls = urls.map(url => ({
         url: `${url}`,
         userData: {
@@ -18,8 +19,8 @@ exports.getSources = async () => {
             state: 'INITIAL'
         },
     }));
-    unloadedUrls = unloadedUrls.map(url => ({
-        url: `${url}`,
+    unloadedUrls = unloadedUrls.map(topic => ({
+        url: `${topic.url}`,
         userData: {
             label: 'DETAIL',
         },
@@ -34,7 +35,7 @@ exports.createRouter = globalContext => {
             log.warning(`Incorrect URL provided: ${requestContext.request.loadedUrl}`);
             return;
         }
-        const route = routes[domainName][routeName];
+        const route = routes(domainName)[routeName];
         if (!route) throw new Error(`No route for name: ${routeName}`);
         log.debug(`Invoking route for ${domainName}: ${routeName}`);
         return route(requestContext, globalContext);

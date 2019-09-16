@@ -26,3 +26,7 @@ const $ = cheerio.load(html);
 const textToSearch = "H1 title";
 const found = $(`h1:icontains("${textToSearch}"),h2:icontains("${textToSearch}"),h3:icontains("${textToSearch}")`).text();
 console.log(`Found: ${found}`);
+
+//<div id="navigation" class=""><a href="https://www.zagorodna.com">Главная</a> &gt; <a href="https://www.zagorodna.com/ru/novosti">Новости недвижимости</a> &gt; <a href="https://www.zagorodna.com/ru/novosti/bookmarks/novosti_bez_temy">Новости без темы</a> &gt; <p class="selectorgadget_suggested">На Венецианском острове в Киеве появится парк развлечений</p></div>
+//https://www.zagorodna.com/ru/novosti/na-venecianskom-ostrove-v-kieve-poiavitsia-park-razvlecheniy.html
+//На Венецианском острове в Киеве появится парк развлечений

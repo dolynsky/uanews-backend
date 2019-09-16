@@ -5,12 +5,14 @@ const {
     utils: { log },
 } = Apify;
 
+log.setLevel(log.LEVELS.DEBUG);
+
 module.exports = async function () {
-    prepopulateFromUkrNet();
+    await prepopulateFromUkrNet();
     crawlPages();
 }
 
-function crawlPages() {
+async function crawlPages() {
     log.info('Starting gather.');
     const requestList = await Apify.openRequestList('main', await tools.getSources());
     const requestQueue = await Apify.openRequestQueue();
