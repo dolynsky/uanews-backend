@@ -1,4 +1,4 @@
-const Topic = require("../models/topic");
+const {Topic} = require("../models");
 const axios = require("axios");
 const getContent = require("./getContent");
 const calcRating = require("./calcContentMatches");

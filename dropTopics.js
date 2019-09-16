@@ -1,2 +1,2 @@
-const Topic = require("./models/topic");
+const {Topic} = require("./models");
 Topic.collection.drop();

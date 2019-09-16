@@ -5,8 +5,9 @@ const morgan = require("morgan");
 const cron = require("node-cron");
 const mongoose = require("mongoose");
 const topicRoutes = require("./routes/topics");
-const gather = require("./gather");
+const gather = require("./gather2");
 const rebuildMatches = require("./gather/rebuildMatches");
+require('dotenv').config();
 
 mongoose.Promise = Promise;
 //mongoose.set("debug", true);
@@ -38,7 +39,7 @@ app.listen(3001, function() {
     console.log("Server starting on port 3001");
 });
 
-cron.schedule("* * * * *", gather);
+//cron.schedule("* * * * *", gather);
 
-//gather();
+gather();
 //rebuildMatches();
