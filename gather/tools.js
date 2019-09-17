@@ -35,8 +35,8 @@ exports.createRouter = globalContext => {
             log.warning(`Incorrect URL provided: ${requestContext.request.url}`);
             return;
         }
-        const route = routes(domainName)[routeName];
-        if (!route) throw new Error(`No route for name: ${routeName}`);
+        const route = routes(domainName)()[routeName];
+        if (!route) throw new Error(`No route for domain ${domainName}: ${routeName}`);
         //log.debug(`Invoking route for ${domainName}: ${routeName}`);
         return route(requestContext, globalContext);
     };

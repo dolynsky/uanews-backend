@@ -11,7 +11,19 @@ module.exports = async function(topic) {
         }
     });
 
-    //console.log(`Content matches: ${matches} (${topic.title})`);
+    const title = topic.title.toLowerCase();
+    matches = 0;
+    filters.forEach(({text, isExclude}) => {
+        if (title.includes(text)) {
+            if (!isExclude) {
+                matches++;
+            } else {
+                topic.isExcluded = true;
+            }
+        }
+    });
+
+    topic.titleMatches = matches;
     topic.contentMatches = matches;
     await topic.save();
 };

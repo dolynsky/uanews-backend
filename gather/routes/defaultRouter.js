@@ -1,7 +1,6 @@
 const Apify = require("apify");
 const { Topic, findByURL } = require("../../models");
-const calcContentMatches = require("../utils/calcContentMatches");
-const calcTitleMatches = require("../utils/calcTitleMatches");
+const calcMatches = require("../utils/calcMatches");
 const { trimText } = require("../../utils/index");
 const DOMSearcher = require("../search/DOMSearcher");
 const cheerio = require("cheerio");
@@ -32,11 +31,9 @@ exports.default = {
         try {
             await topic.save();
             if (topic.content) {
-                await calcTitleMatches(topic);
-                await calcContentMatches(topic);
+                await calcMatches(topic);
             }
-        }
-        catch (e) {
+        } catch (e) {
             log.error(e);
         }
     }
@@ -47,30 +44,35 @@ function cleanUpTitle(title) {
 }
 
 function getTitleSelector(html, title) {
-    const $ = cheerio.load(html);
-    const domSearcher = new DOMSearcher({ html });
-    const titleSelectors = domSearcher.find([title]);
-    let titleSelector = "";
+    try {
+        const $ = cheerio.load(html);
+        const domSearcher = new DOMSearcher({ html });
+        const titleSelectors = domSearcher.find([title]);
+        let titleSelector = "";
 
-    if (titleSelectors.length) {
-        titleSelector = titleSelectors[0].selector;
-        for (let i = 1; i < titleSelectors.length; i++) {
-            if (titleSelector.length > titleSelectors[i].selector.length) {
-                titleSelector = titleSelectors[i].selector;
+        if (titleSelectors.length) {
+            titleSelector = titleSelectors[0].selector;
+            for (let i = 1; i < titleSelectors.length; i++) {
+                if (titleSelector.length > titleSelectors[i].selector.length) {
+                    titleSelector = titleSelectors[i].selector;
+                }
             }
-        }
 
-        let nodes = $(titleSelector);
+            let nodes = $(titleSelector);
 
-        if (nodes.length > 0) {
-            content = trimText(nodes.text());
-            while (content.length < 500) {
-                nodes = nodes.parent();
+            if (nodes.length > 0) {
                 content = trimText(nodes.text());
+                while (content.length < 500) {
+                    nodes = nodes.parent();
+                    content = trimText(nodes.text());
+                }
             }
         }
+        return titleSelector;
+    } catch (e) {
+        log.error("Default router: error during title selector search with url:", request.url);
+        return "";
     }
-    return titleSelector;
 }
 
 function getContentNearTitle($node) {

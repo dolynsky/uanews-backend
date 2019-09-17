@@ -16,7 +16,7 @@ module.exports = async function() {
                 topics = topics.concat(tops);
             });
 
-            topics = topics.slice(0, 20);
+            topics = topics.slice(0, 10);
 
             topicsPromises = topics.map(({ Region, DateCreated, Title, PartnerTitle, Url, Id }) => {
                 return Topic.create({

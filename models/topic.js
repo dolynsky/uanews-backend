@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const topicSchema = new mongoose.Schema({
-    topicID: { type: Number, required: true, unique: true },
     url: { type: String, required: true },
     partner: String,
     region: String,

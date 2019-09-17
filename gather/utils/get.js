@@ -8,11 +8,13 @@ module.exports = async function(url) {
             {
                 uri: url,
                 method: "GET",
-                encoding: "binary"
+                encoding: "binary",
+                rejectUnauthorized: false,
+                insecure: true
             },
             async function(error, response, body) {
                 if (error) {
-                    log.error(`Could not get response: ${error}`);
+                    console.log(`ERROR: Could not get response: ${error}`);
                     reject(error);
                 }
                 var ctype = response.headers["content-type"];

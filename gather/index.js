@@ -1,6 +1,5 @@
 const Apify = require("apify");
-const request = require("request");
-const iconv = require("iconv");
+const get = require("./utils/get");
 const tools = require("./tools");
 const prepopulateFromUkrNet = require("./ukrnet/prepopulateFromUkrNet");
 const {
@@ -26,30 +25,14 @@ async function crawlPages() {
         requestList,
         requestQueue,
         handleRequestFunction: async context => {
-            request(
-                {
-                    uri: context.request.url,
-                    method: "GET",
-                    encoding: "binary"
-                },
-                async function(error, response, body) {
-                    log.info(`Processing ${context.request.url}`);
-                    if (error) {
-                        log.error(`Could not get response: ${error}`);
-                        return;
-                    }
-                    var ctype = response.headers["content-type"];
-                    body = Buffer.from(body, "binary");
-                    if (ctype.includes("charset=windows-1251")) {
-                        conv = new iconv.Iconv("windows-1251", "utf8");
-                    } else {
-                        conv = new iconv.Iconv("utf8", "utf8//IGNORE");
-                    }
-                    body = conv.convert(body).toString();
-                    context.html = body;
+            await get(context.request.url)
+                .then(async data => {
+                    context.html = data;
                     await router(context.request.userData.label, context);
-                }
-            );
+                })
+                .catch(e => {
+                    console.log(e);
+                });
         }
     });
 

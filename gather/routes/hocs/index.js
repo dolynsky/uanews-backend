@@ -2,7 +2,8 @@ const Apify = require("apify");
 const cheerio = require("cheerio");
 const { URL } = require("url");
 const { getDomainName, getHttpDomainName } = require("../../../utils");
-const { Topic, checkSomeUrlLoaded, getCountOfTopicsFromDomain, checkUrlLoaded } = require("../../../models");
+const { Topic, checkSomeUrlLoaded, getCountOfTopicsFromDomain, findByURL } = require("../../../models");
+const calcMatches = require("../../utils/calcMatches");
 const { trimText } = require("../../../utils/index");
 const {
     utils: { log }
@@ -72,15 +73,18 @@ exports.default = ({ topicsSelector, nextSelector, detailTitleSelector, detailCo
                 partner: domain,
                 title: $(detailTitleSelector).text(),
                 content: trimText($(detailContentSelector).text()),
-                date: dateParser($(detailDateSelector))
+                date: dateParser($(detailDateSelector)),
+                isLoaded: true
             };
 
+            console.log(`Content nodes found: ${$(detailContentSelector).length}`);
+
             if (saveToDB) {
-                const topics = await checkUrlLoaded(request.url);
-                if (!topics) {
-                    await Topic.create(results);
-                    log.debug("Saving data:");
-                    log.debug(JSON.stringify(results, undefined, 2));
+                const res = await Topic.updateOne({ url: request.url }, results, { upsert: true });
+                console.log(`n: ${res.n}, ${res.nModified}`)
+                const topic = await findByURL(request.url);
+                if (topic.content) {
+                    await calcMatches(topic);
                 }
             }
             return results;
