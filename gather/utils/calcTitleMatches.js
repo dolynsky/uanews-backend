@@ -1,4 +1,4 @@
-const Filter = require("../models/filter");
+const Filter = require("../../models/filter");
 
 module.exports = async function(topic) {
     const filters = await Filter.find({});

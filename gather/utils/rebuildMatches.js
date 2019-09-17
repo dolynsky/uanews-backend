@@ -1,4 +1,4 @@
-const {Topic} = require("../models");
+const {Topic} = require("../../models");
 const calcContentMatches = require("./calcContentMatches");
 const calcTitleMatches = require("./calcTitleMatches");
 

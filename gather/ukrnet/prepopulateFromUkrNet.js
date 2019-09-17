@@ -16,7 +16,7 @@ module.exports = async function() {
                 topics = topics.concat(tops);
             });
 
-            topics = topics.slice(0, 5);
+            topics = topics.slice(0, 20);
 
             topicsPromises = topics.map(({ Region, DateCreated, Title, PartnerTitle, Url, Id }) => {
                 return Topic.create({
@@ -36,7 +36,7 @@ module.exports = async function() {
             });
             await Promise.all(topicsPromises).then(topics => {
                 topics = topics.filter(el => el != null);
-                console.log(`Topics created: ${topics.length}`);
+                console.log(`INFO: Topics created: ${topics.length}`);
             });
         })
     );

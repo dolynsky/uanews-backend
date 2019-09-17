@@ -5,16 +5,16 @@ const morgan = require("morgan");
 const cron = require("node-cron");
 const mongoose = require("mongoose");
 const topicRoutes = require("./routes/topics");
-const gather = require("./gather2");
-const rebuildMatches = require("./gather/rebuildMatches");
-require('dotenv').config();
+const gather = require("./gather");
+const rebuildMatches = require("./gather/utils/rebuildMatches");
+require("dotenv").config();
 
 mongoose.Promise = Promise;
-mongoose.set("debug", true);
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
-mongoose.set('useUnifiedTopology', true);
+//mongoose.set("debug", true);
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
+mongoose.set("useCreateIndex", true);
+mongoose.set("useUnifiedTopology", true);
 mongoose.connect("mongodb://localhost/uanews-app");
 
 app.use(morgan("tiny"));

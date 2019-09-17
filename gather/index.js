@@ -1,98 +1,59 @@
-const {Topic} = require("../models");
-const axios = require("axios");
-const getContent = require("./getContent");
-const calcRating = require("./calcContentMatches");
-const calcTitleMatches = require("./calcTitleMatches");
+const Apify = require("apify");
+const request = require("request");
+const iconv = require("iconv");
+const tools = require("./tools");
+const prepopulateFromUkrNet = require("./ukrnet/prepopulateFromUkrNet");
+const {
+    utils: { log }
+} = Apify;
 
-const regions = [
-    "kiev",
-    "ivano_frankovsk",
-    "lutsk",
-    "zhitomir",
-    "lvov",
-    "poltava",
-    "ternopol",
-    "hmelnitskij",
-    "chernovtsy",
-    "dnepropetrovsk",
-    "uzhgorod",
-    "kirovograd",
-    "nikolaev",
-    "rovno",
-    "kharkov",
-    "cherkassy",
-    "vinnitsa",
-    "zaporozhje",
-    "odessa",
-    "sumy",
-    "herson",
-    "chernigov"
-];
+log.setLevel(log.LEVELS.DEBUG);
 
-function getUrl(city, page) {
-    const template = "https://www.ukr.net/news/dat/{city}/{page}";
-    let url = template.replace("{city}", city);
-    if (page > 1) {
-        url = url.replace("{page}", String(page) + "/");
-    } else {
-        url = url.replace("{page}", "");
-    }
-    return url;
-}
+module.exports = async function() {
+    await prepopulateFromUkrNet();
+    crawlPages();
+};
 
-module.exports = async function () {
-    console.log("Gather data...");
-    let depth = 1;
-    const topicsinDB = await Topic.find({}).countDocuments();
-    if (topicsinDB === 0) {
-        //depth = 10;
-    }
+async function crawlPages() {
+    log.info("Starting gather.");
+    const requestList = await Apify.openRequestList(null, await tools.getSources());
+    const requestQueue = await Apify.openRequestQueue();
+    const router = tools.createRouter({ requestQueue });
 
-    let urls = [];
-    regions.forEach(city => {
-        for (let page = 1; page <= depth; page++) {
-            urls.push(getUrl(city, page));
+    log.debug("Setting up crawler.");
+    const crawler = new Apify.BasicCrawler({
+        //maxRequestsPerCrawl: 50,
+        requestList,
+        requestQueue,
+        handleRequestFunction: async context => {
+            request(
+                {
+                    uri: context.request.url,
+                    method: "GET",
+                    encoding: "binary"
+                },
+                async function(error, response, body) {
+                    log.info(`Processing ${context.request.url}`);
+                    if (error) {
+                        log.error(`Could not get response: ${error}`);
+                        return;
+                    }
+                    var ctype = response.headers["content-type"];
+                    body = Buffer.from(body, "binary");
+                    if (ctype.includes("charset=windows-1251")) {
+                        conv = new iconv.Iconv("windows-1251", "utf8");
+                    } else {
+                        conv = new iconv.Iconv("utf8", "utf8//IGNORE");
+                    }
+                    body = conv.convert(body).toString();
+                    context.html = body;
+                    await router(context.request.userData.label, context);
+                }
+            );
         }
     });
 
-    axios.all(urls.map(url => axios.get(url))).then(
-        axios.spread(function(...responses) {
-            let topics = [];
-            responses.forEach(res => {
-                const { tops, Title } = res.data;
-                tops.forEach(top => (top.Region = Title));
-                topics = topics.concat(tops);
-            });
-
-            //topics = topics.slice(0, 5);
-
-            topicsPromises = topics.map(({ Region, DateCreated, Title, PartnerTitle, Url, Id }) => {
-                return Topic.create({
-                    topicID: Id,
-                    url: Url,
-                    partner: PartnerTitle,
-                    region: Region,
-                    title: Title,
-                    date: new Date(DateCreated * 1000)
-                })
-                .then(async function(topic) {
-                    //console.log(`Topic created: ${topic.title}`);
-                    await calcTitleMatches(topic);
-                    await getContent(topic);
-                    return topic;
-                })
-                .catch(e => {
-                    if (e.code !== 11000) {
-                        //console.log(e);
-                    }
-                    return null;
-                });
-            });
-            Promise.all(topicsPromises)
-            .then((topics)=>{
-                topics = topics.filter(el => el != null);
-                console.log(`Topics created: ${topics.length}`);
-            })
-        })
-    );
+    log.info("Starting the crawl.");
+    await crawler.run();
+    log.info("Gather finished.");
 }

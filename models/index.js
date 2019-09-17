@@ -2,6 +2,11 @@ const Topic = require("./Topic");
 
 module.exports.Topic = Topic;
 
+module.exports.findByURL = async function(url) {
+    const found = await Topic.findOne({ url: url });
+    return found;
+};
+
 module.exports.getTopicsCount = async function() {
     const found = await Topic.find({}).countDocuments();
     return found;

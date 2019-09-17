@@ -1,11 +1,16 @@
-const axios = require("axios");
-const DOMSearcher = require("../gather2/search/DOMSearcher");
+const cheerio = require("cheerio");
+const DOMSearcher = require("../gather/search/DOMSearcher");
+const get = require("../gather/utils/get");
+const tsnua = require("../gather/routes/sites/tsnua").default;
 
-const url = "https://openkyiv.info/ru/news/na-mostu-snova-otkryli-steklyannye-sekcii";
+const url = "https://tsn.ua/ukrayina/ochilnik-dbr-anonsuvav-zavershennya-u-spravi-pro-vbivstvo-na-kiyivschini-5-richnogo-hlopchika-1412631.html";
+const router = tsnua({saveToDB: false});
 
-axios.get(url).then(res => {
-    const ds = new DOMSearcher({html: res.data});
-    //console.log("res.data:", res.data.length);
-    const result = ds.find(["На велопешеходном мосту снова открыли стеклянные секции (видео)"]);
-    console.log(result);
-});
+get(url)
+    .then(async data => {
+        const results = await router.DETAIL({request: {url}, html: data});
+        console.log(results);
+    })
+    .catch(e => {
+        console.log(e);
+    });
