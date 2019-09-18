@@ -14,8 +14,8 @@ module.exports = async function(url) {
             },
             async function(error, response, body) {
                 if (error) {
-                    console.log(`ERROR: Could not get response: ${error}`);
                     reject(error);
+                    return;
                 }
                 var ctype = response.headers["content-type"];
                 body = Buffer.from(body, "binary");

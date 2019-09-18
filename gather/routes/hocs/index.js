@@ -77,11 +77,9 @@ exports.default = ({ topicsSelector, nextSelector, detailTitleSelector, detailCo
                 isLoaded: true
             };
 
-            console.log(`Content nodes found: ${$(detailContentSelector).length}`);
-
             if (saveToDB) {
                 const res = await Topic.updateOne({ url: request.url }, results, { upsert: true });
-                console.log(`n: ${res.n}, ${res.nModified}`)
+                console.log(`update result: matched ${res.n}, modified ${res.nModified}`)
                 const topic = await findByURL(request.url);
                 if (topic.content) {
                     await calcMatches(topic);

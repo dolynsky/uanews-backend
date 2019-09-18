@@ -14,8 +14,12 @@ module.exports = async function() {
 };
 
 async function crawlPages() {
-    log.info("Starting gather.");
-    const requestList = await Apify.openRequestList(null, await tools.getSources());
+    const sources = await tools.getSources();
+    if (!sources.length) {
+        console.log("WARNING: No sources. Crawl not started");
+        return;
+    }
+    const requestList = await Apify.openRequestList(null, sources);
     const requestQueue = await Apify.openRequestQueue();
     const router = tools.createRouter({ requestQueue });
 
@@ -31,12 +35,12 @@ async function crawlPages() {
                     await router(context.request.userData.label, context);
                 })
                 .catch(e => {
-                    console.log(e);
+                    console.log(`ERROR: Could not get response: ${e}`);
                 });
         }
     });
 
     log.info("Starting the crawl.");
     await crawler.run();
-    log.info("Gather finished.");
+    log.info("Crawl finished.");
 }

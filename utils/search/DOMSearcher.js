@@ -232,6 +232,7 @@ class DOMSearcher {
         };
         const normalizedText = normalize(elementText); // to lower case to match most results
         const score = this.normalizedSearch.reduce((lastScore, searchString) => {
+            console.log(`normalizedText: ${normalizedText}   searchString: ${searchString}`)
             if (normalizedText.indexOf(searchString) === -1) return lastScore;
             const remainingTextLength = normalizedText.replace(searchString, '').length;
             const searchScore = (1 + (remainingTextLength * LETTER_DEDUCTION));

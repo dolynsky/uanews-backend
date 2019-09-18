@@ -1,5 +1,6 @@
 const getURLs = require("./urls");
 const { getTopicsCount } = require("../../models");
+const { getDomainName } = require("../../utils");
 const axios = require("axios");
 const { Topic } = require("../../models");
 
@@ -16,23 +17,27 @@ module.exports = async function() {
                 topics = topics.concat(tops);
             });
 
-            topics = topics.slice(0, 10);
+            topics = topics.slice(0, 20);
 
             topicsPromises = topics.map(({ Region, DateCreated, Title, PartnerTitle, Url, Id }) => {
-                return Topic.create({
-                    topicID: Id,
-                    url: Url,
-                    partner: PartnerTitle,
-                    region: Region,
-                    title: Title,
-                    date: new Date(DateCreated * 1000),
-                    isLoaded: false
-                }).catch(e => {
-                    if (e.code !== 11000) {
-                        //console.log(e);
-                    }
+                if (!getDomainName(Url)) {
                     return null;
-                });
+                } else {
+                    return Topic.create({
+                        topicID: Id,
+                        url: Url,
+                        partner: PartnerTitle,
+                        region: Region,
+                        title: Title,
+                        date: new Date(DateCreated * 1000),
+                        isLoaded: false
+                    }).catch(e => {
+                        if (e.code !== 11000) {
+                            //console.log(e);
+                        }
+                        return null;
+                    });
+                }
             });
             await Promise.all(topicsPromises).then(topics => {
                 topics = topics.filter(el => el != null);
