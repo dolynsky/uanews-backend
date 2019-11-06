@@ -22,7 +22,7 @@
     "html-entities": "^1.2.1",
     "iconv": "^2.3.4",
     "lodash": "^4.17.15",
-    "mongoose": "^5.7.0",
+    "mongoose": "^5.7.5",
     "morgan": "^1.9.1",
     "node-cron": "^2.0.3",
     "request": "^2.88.0",
